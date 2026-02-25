@@ -109,6 +109,11 @@ class XiuxianGame {
             const stoneReward = Math.floor(next.required / 2);
             this.state.spiritStones += stoneReward;
             
+            // 播放突破特效
+            if (typeof playBreakthroughEffect === 'function') {
+                playBreakthroughEffect();
+            }
+            
             const modal = document.getElementById('breakthrough-modal');
             const msg = document.getElementById('breakthrough-message');
             msg.innerHTML = `恭喜突破到 <strong style="color: var(--accent);">${next.name}</strong><br>获得 ${stoneReward} 灵石奖励！<br>自动修炼速度提升！`;
@@ -329,8 +334,254 @@ class XiuxianGame {
     }
 }
 
-// 全局实例
-let game;
+// 粒子效果系统
+class ParticleSystem {
+    constructor() {
+        this.container = document.getElementById('particles-container');
+        this.particles = [];
+    }
+    
+    // 点击修炼时的粒子爆发
+    spawnClickParticles(x, y) {
+        for (let i = 0; i < 8; i++) {
+            this.createParticle(x, y, 'gold');
+        }
+    }
+    
+    // 修为数字飘动
+    spawnFloatingText(x, y, text, color = '#ffd700') {
+        const el = document.createElement('div');
+        el.className = 'floating-text';
+        el.textContent = text;
+        el.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            color: ${color};
+            font-size: 20px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1000;
+            text-shadow: 0 0 10px ${color};
+            animation: floatUp 1s ease-out forwards;
+        `;
+        this.container.appendChild(el);
+        
+        setTimeout(() => el.remove(), 1000);
+    }
+    
+    createParticle(x, y, type) {
+        const el = document.createElement('div');
+        const colors = {
+            gold: '#ffd700',
+            cyan: '#00ffff',
+            purple: '#9d4edd'
+        };
+        
+        el.style.cssText = `
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: ${colors[type] || colors.gold};
+            border-radius: 50%;
+            left: ${x}px;
+            top: ${y}px;
+            pointer-events: none;
+            box-shadow: 0 0 6px ${colors[type] || colors.gold};
+        `;
+        
+        this.container.appendChild(el);
+        
+        // 随机运动
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 2 + Math.random() * 3;
+        let vx = Math.cos(angle) * velocity;
+        let vy = Math.sin(angle) * velocity - 2;
+        let opacity = 1;
+        
+        const animate = () => {
+            const currentLeft = parseFloat(el.style.left);
+            const currentTop = parseFloat(el.style.top);
+            
+            el.style.left = (currentLeft + vx) + 'px';
+            el.style.top = (currentTop + vy) + 'px';
+            el.style.opacity = opacity;
+            
+            vy += 0.2; // 重力
+            opacity -= 0.02;
+            
+            if (opacity > 0) {
+                requestAnimationFrame(animate);
+            } else {
+                el.remove();
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }
+}
+
+// 背景动画
+class BackgroundAnimation {
+    constructor() {
+        this.canvas = document.getElementById('bg-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.stars = [];
+        this.energy = [];
+        this.init();
+    }
+    
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        // 创建星星
+        for (let i = 0; i < 100; i++) {
+            this.stars.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                size: Math.random() * 2,
+                speed: 0.1 + Math.random() * 0.3
+            });
+        }
+        
+        // 创建灵气流动
+        for (let i = 0; i < 20; i++) {
+            this.energy.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                size: 20 + Math.random() * 30,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                life: Math.random()
+            });
+        }
+        
+        this.animate();
+    }
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    
+    animate() {
+        this.ctx.fillStyle = 'rgba(10, 10, 26, 0.1)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // 绘制星星
+        this.ctx.fillStyle = '#ffffff';
+        this.stars.forEach(star => {
+            this.ctx.globalAlpha = 0.3 + Math.random() * 0.7;
+            this.ctx.beginPath();
+            this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            star.y += star.speed;
+            if (star.y > this.canvas.height) {
+                star.y = 0;
+                star.x = Math.random() * this.canvas.width;
+            }
+        });
+        
+        // 绘制灵气
+        this.energy.forEach(e => {
+            const gradient = this.ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.size);
+            gradient.addColorStop(0, `rgba(255, 215, 0, ${e.life * 0.1})`);
+            gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.beginPath();
+            this.ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            e.x += e.vx;
+            e.y += e.vy;
+            e.life += 0.005;
+            
+            if (e.life > 1 || e.x < 0 || e.x > this.canvas.width || 
+                e.y < 0 || e.y > this.canvas.height) {
+                e.x = Math.random() * this.canvas.width;
+                e.y = Math.random() * this.canvas.height;
+                e.life = 0;
+            }
+        });
+        
+        this.ctx.globalAlpha = 1;
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// 突破特效
+function playBreakthroughEffect() {
+    const container = document.getElementById('particles-container');
+    
+    // 金色光环
+    const ring = document.createElement('div');
+    ring.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border: 10px solid #ffd700;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 999;
+        box-shadow: 0 0 50px #ffd700;
+    `;
+    container.appendChild(ring);
+    
+    // 扩散动画
+    let size = 0;
+    const expand = () => {
+        size += 20;
+        ring.style.width = size + 'px';
+        ring.style.height = size + 'px';
+        ring.style.opacity = 1 - (size / 1000);
+        
+        if (size < 1000) {
+            requestAnimationFrame(expand);
+        } else {
+            ring.remove();
+        }
+    };
+    expand();
+    
+    // 粒子爆发
+    const particles = new ParticleSystem();
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            particles.createParticle(
+                window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+                window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+                'gold'
+            );
+        }, i * 50);
+    }
+}
+
+// 初始化视觉系统
 document.addEventListener('DOMContentLoaded', () => {
-    game = new XiuxianGame();
+    const bg = new BackgroundAnimation();
+    const particles = new ParticleSystem();
+    
+    // 重写点击函数以添加特效
+    const originalCultivate = game?.cultivate;
+    
+    // 修改点击区域添加粒子
+    const cultivator = document.getElementById('cultivator');
+    if (cultivator) {
+        cultivator.addEventListener('click', (e) => {
+            const rect = cultivator.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            particles.spawnClickParticles(x, y);
+            
+            const clickPower = game ? game.getClickPower() : 5;
+            particles.spawnFloatingText(x, y - 50, '+' + clickPower + ' 修为');
+        });
+    }
 });

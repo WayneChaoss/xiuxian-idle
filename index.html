@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- 动态背景 -->
+    <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+    
+    <!-- 粒子容器 -->
+    <div id="particles-container" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;"></div>
+
     <div id="game-container">
         <!-- 顶部信息 -->
         <header>
