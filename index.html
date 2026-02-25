@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修仙放置 - 凡人修仙传</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 顶部信息 -->
+        <header>
+            <h1>☯️ 凡人修仙传</h1>
+            <div id="stats">
+                <div class="stat">
+                    <span class="label">💎 灵石</span>
+                    <span id="spirit-stones" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">⚡ 修为</span>
+                    <span id="cultivation" class="value">0</span>
+                    <span id="cultivation-rate">(+0/秒)</span>
+                </div>
+                <div class="stat">
+                    <span class="label">🎯 境界</span>
+                    <span id="realm" class="value">凡人</span>
+                </div>
+                <div class="stat">
+                    <span class="label">⏱️ 道年</span>
+                    <span id="game-time" class="value">0年</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主游戏区域 -->
+        <main>
+            <!-- 修炼区域 -->
+            <section id="cultivation-area">
+                <div id="cultivator" onclick="game.cultivate()">
+                    <div id="cultivator-icon">🧘</div>
+                    <div id="cultivator-name">打坐修炼</div>
+                    <div id="cultivator-desc">点击获得修为</div>
+                </div>
+                
+                <div id="breakthrough-area">
+                    <div id="breakthrough-progress">
+                        <div id="progress-fill"></div>
+                    </div>
+                    <div id="progress-text">0 / 100</div>
+                    <button id="breakthrough-btn" onclick="game.attemptBreakthrough()" disabled>
+                        🔮 突破境界
+                    </button>
+                </div>
+            </section>
+
+            <!-- 功法区域 -->
+            <section id="techniques-area">
+                <h2>📜 功法</h2>
+                <div id="techniques-list"></div>
+            </section>
+
+            <!-- 洞府区域 -->
+            <section id="cave-area">
+                <h2>🏯 洞府</h2>
+                <div id="cave-list"></div>
+            </section>
+        </main>
+
+        <!-- 底部操作 -->
+        <footer>
+            <button onclick="game.save()" class="footer-btn">💾 保存</button>
+            <button onclick="game.exportSave()" class="footer-btn">📤 导出</button>
+            <button onclick="game.importSave()" class="footer-btn">📥 导入</button>
+            <button onclick="game.hardReset()" class="footer-btn danger">⚠️ 重置</button>
+        </footer>
+    </div>
+
+    <!-- 突破弹窗 -->
+    <div id="breakthrough-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎉 突破成功！</h2>
+            <p id="breakthrough-message"></p>
+            <button onclick="game.dismissBreakthrough()">继续修炼</button>
+        </div>
+    </div>
+
+    <!-- 离线收益弹窗 -->
+    <div id="offline-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🌟 闭关结束</h2>
+            <p id="offline-message"></p>
+            <button onclick="game.dismissOffline()">领取修为</button>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
