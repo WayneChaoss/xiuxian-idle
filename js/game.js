@@ -83,8 +83,20 @@ class XiuxianGame {
         
         // 视觉反馈
         const icon = document.getElementById('cultivator-icon');
-        icon.style.transform = 'scale(1.2)';
-        setTimeout(() => icon.style.transform = '', 100);
+        if (icon) {
+            icon.style.transform = 'scale(1.2)';
+            setTimeout(() => icon.style.transform = '', 100);
+        }
+        
+        // 粒子效果
+        const cultivator = document.getElementById('cultivator');
+        if (cultivator && window.particleSystem) {
+            const rect = cultivator.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            window.particleSystem.spawnClickParticles(x, y);
+            window.particleSystem.spawnFloatingText(x, y - 50, '+' + clickPower + ' 修为');
+        }
         
         this.render();
     }
@@ -565,23 +577,5 @@ function playBreakthroughEffect() {
 // 初始化视觉系统
 document.addEventListener('DOMContentLoaded', () => {
     const bg = new BackgroundAnimation();
-    const particles = new ParticleSystem();
-    
-    // 重写点击函数以添加特效
-    const originalCultivate = game?.cultivate;
-    
-    // 修改点击区域添加粒子
-    const cultivator = document.getElementById('cultivator');
-    if (cultivator) {
-        cultivator.addEventListener('click', (e) => {
-            const rect = cultivator.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-            
-            particles.spawnClickParticles(x, y);
-            
-            const clickPower = game ? game.getClickPower() : 5;
-            particles.spawnFloatingText(x, y - 50, '+' + clickPower + ' 修为');
-        });
-    }
+    window.particleSystem = new ParticleSystem();
 });
