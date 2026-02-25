@@ -105,9 +105,13 @@ class XiuxianGame {
             // 突破成功
             this.state.realmLevel = next.required;
             
+            // 突破奖励灵石（根据境界）
+            const stoneReward = Math.floor(next.required / 2);
+            this.state.spiritStones += stoneReward;
+            
             const modal = document.getElementById('breakthrough-modal');
             const msg = document.getElementById('breakthrough-message');
-            msg.innerHTML = `恭喜突破到 <strong style="color: var(--accent);">${next.name}</strong><br>自动修炼速度提升！`;
+            msg.innerHTML = `恭喜突破到 <strong style="color: var(--accent);">${next.name}</strong><br>获得 ${stoneReward} 灵石奖励！<br>自动修炼速度提升！`;
             modal.classList.remove('hidden');
         } else {
             // 突破失败，损失部分修为

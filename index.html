@@ -34,36 +34,39 @@
 
         <!-- 主游戏区域 -->
         <main>
-            <!-- 修炼区域 -->
-            <section id="cultivation-area">
-                <div id="cultivator" onclick="game.cultivate()">
-                    <div id="cultivator-icon">🧘</div>
-                    <div id="cultivator-name">打坐修炼</div>
-                    <div id="cultivator-desc">点击获得修为</div>
-                </div>
-                
-                <div id="breakthrough-area">
-                    <div id="breakthrough-progress">
-                        <div id="progress-fill"></div>
+            <!-- 左侧：修炼和突破 -->
+            <div class="left-panel">
+                <section id="cultivation-area">
+                    <div id="cultivator" onclick="game.cultivate()">
+                        <div id="cultivator-icon">🧘</div>
+                        <div id="cultivator-name">打坐修炼</div>
+                        <div id="cultivator-desc">点击获得修为</div>
                     </div>
-                    <div id="progress-text">0 / 100</div>
-                    <button id="breakthrough-btn" onclick="game.attemptBreakthrough()" disabled>
-                        🔮 突破境界
-                    </button>
-                </div>
-            </section>
+                    
+                    <div id="breakthrough-area">
+                        <div id="breakthrough-progress">
+                            <div id="progress-fill"></div>
+                        </div>
+                        <div id="progress-text">0 / 100</div>
+                        <button id="breakthrough-btn" onclick="game.attemptBreakthrough()" disabled>
+                            🔮 突破境界
+                        </button>
+                    </div>
+                </section>
+            </div>
 
-            <!-- 功法区域 -->
-            <section id="techniques-area">
-                <h2>📜 功法</h2>
-                <div id="techniques-list"></div>
-            </section>
+            <!-- 右侧：功法和洞府 -->
+            <div class="right-panel">
+                <section id="techniques-area">
+                    <h2>📜 功法</h2>
+                    <div id="techniques-list"></div>
+                </section>
 
-            <!-- 洞府区域 -->
-            <section id="cave-area">
-                <h2>🏯 洞府</h2>
-                <div id="cave-list"></div>
-            </section>
+                <section id="cave-area">
+                    <h2>🏯 洞府</h2>
+                    <div id="cave-list"></div>
+                </section>
+            </div>
         </main>
 
         <!-- 底部操作 -->
