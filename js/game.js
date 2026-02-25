@@ -146,9 +146,9 @@ class XiuxianGame {
         }
     }
     
-    // 计算点击修为
+    // 计算点击修为（基础5，随境界增长）
     getClickPower() {
-        let power = 1;
+        let power = 5; // 基础点击修为
         const realm = getCurrentRealm(this.state.realmLevel);
         power *= realm.multiplier;
         
